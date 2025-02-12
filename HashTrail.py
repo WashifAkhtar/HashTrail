@@ -8,14 +8,14 @@ from api_key import API_KEY
 TX_HASH = "4ca5ea121cc26854299d02128738612ce948a6fddcbce781925237c50bf9e5ad"
 chainShortName="TRON"      #ChainName and protocolName can be found in oklink.com
 protocolType="token_20"    #USDT
-num_transactions = 10 
-
+num_transactions = 5
+output_file=f"{TX_HASH}.xlsx"
 
 # Global storage for transactions
 traced_transactions = []
 
 # Function to save transactions to Excel
-def save_to_excel(output_file=f"{TX_HASH}.xlsx"):
+def save_to_excel(output_file):
     """ Saves the collected transactions to an Excel file before exiting. """
     if traced_transactions:
         df = pd.DataFrame(traced_transactions)
@@ -65,6 +65,14 @@ def get_transaction_details(tx_hash):
                             "date": date,
                             "token_amount": token_amount,
                             "transaction_hash": tx_hash,
+                            "token_type": token_type
+                        })
+                        traced_transactions.append({
+                            "txid": tx_hash,
+                            "from": from_address,
+                            "to": to_address,
+                            "date": date,
+                            "amount": token_amount,
                             "token_type": token_type
                         })
 
@@ -134,7 +142,6 @@ def get_next_outgoing_transaction(address, token_type, initial_txid):
 
                             return {
                                 "txid": txid,
-                                # "block": block,
                                 "from": from_address,
                                 "to": to_address,
                                 "date": date,
@@ -162,7 +169,7 @@ def get_next_outgoing_transaction(address, token_type, initial_txid):
         exit(0)  
 
 # Function to trace 10 transactions and save to Excel
-def trace_transactions(tx_hash, num_transactions, output_file="transactions.xlsx"):
+def trace_transactions(tx_hash, num_transactions, output_file):
     try:
         transaction_details = get_transaction_details(tx_hash)
 
@@ -192,4 +199,4 @@ def trace_transactions(tx_hash, num_transactions, output_file="transactions.xlsx
         exit(0)  
 
 # Usage
-trace_transactions(TX_HASH, num_transactions)
+trace_transactions(TX_HASH, num_transactions, output_file)
