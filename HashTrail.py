@@ -4,11 +4,17 @@ import time
 from datetime import datetime, timedelta
 from api_key import API_KEY
 
+# Put the Transaction hash you want to trace
+TX_HASH = "4ca5ea121cc26854299d02128738612ce948a6fddcbce781925237c50bf9e5ad"
+chainShortName="TRON"      #ChainName and protocolName can be found in oklink.com
+protocolType="token_20"    #USDT
+
+
 # Global storage for transactions
 traced_transactions = []
 
 # Function to save transactions to Excel
-def save_to_excel(output_file="transactions.xlsx"):
+def save_to_excel(output_file=f"{TX_HASH}.xlsx"):
     """ Saves the collected transactions to an Excel file before exiting. """
     if traced_transactions:
         df = pd.DataFrame(traced_transactions)
@@ -16,7 +22,7 @@ def save_to_excel(output_file="transactions.xlsx"):
         print(f"📁 Data saved to {output_file} ✅")
     else:
         print("⚠ No transactions to save.")
-
+    
 # Function to fetch transaction details
 def get_transaction_details(tx_hash):
     """ Fetch transaction details including sender, receiver, date, token type, and amount. """
@@ -185,7 +191,4 @@ def trace_transactions(tx_hash, num_transactions=10, output_file="transactions.x
         exit(0)  
 
 # Usage
-TX_HASH = "4ca5ea121cc26854299d02128738612ce948a6fddcbce781925237c50bf9e5ad"
-chainShortName="TRON"
-protocolType="token_20"
 trace_transactions(TX_HASH)
