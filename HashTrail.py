@@ -8,6 +8,7 @@ from api_key import API_KEY
 TX_HASH = "4ca5ea121cc26854299d02128738612ce948a6fddcbce781925237c50bf9e5ad"
 chainShortName="TRON"      #ChainName and protocolName can be found in oklink.com
 protocolType="token_20"    #USDT
+num_transactions = 10 
 
 
 # Global storage for transactions
@@ -161,7 +162,7 @@ def get_next_outgoing_transaction(address, token_type, initial_txid):
         exit(0)  
 
 # Function to trace 10 transactions and save to Excel
-def trace_transactions(tx_hash, num_transactions=10, output_file="transactions.xlsx"):
+def trace_transactions(tx_hash, num_transactions, output_file="transactions.xlsx"):
     try:
         transaction_details = get_transaction_details(tx_hash)
 
