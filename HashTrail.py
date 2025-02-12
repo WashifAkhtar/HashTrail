@@ -192,4 +192,4 @@ def trace_transactions(tx_hash, num_transactions, output_file="transactions.xlsx
         exit(0)  
 
 # Usage
-trace_transactions(TX_HASH)
+trace_transactions(TX_HASH, num_transactions)
