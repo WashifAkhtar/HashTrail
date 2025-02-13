@@ -291,16 +291,16 @@ def toggle_tracking():
     global running
     running = not running
     if running:
-        start_button.configure(text="Stop", fg_color=STOP_COLOR)
+        start_button.configure(text="Stop", fg_color=STOP_COLOR, hover_color=STOP_COLOR)
         tracking_thread = threading.Thread(target=trace_transactions, daemon=True)
         tracking_thread.start()
     else:
-        start_button.configure(text="Start", fg_color=START_COLOR)
-        time.sleep(1)
+        start_button.configure(text="Start", fg_color=START_COLOR, hover_color=START_COLOR)
+        time.sleep(2)
         log_message("⚠ Tracking Stopped.")
         
 # Buttons
-start_button = ctk.CTkButton(frame, text="Start", fg_color=START_COLOR, text_color=TEXT_COLOR, command=toggle_tracking)
+start_button = ctk.CTkButton(frame, text="Start", fg_color=START_COLOR, text_color=TEXT_COLOR, hover_color=START_COLOR, command=toggle_tracking)
 start_button.grid(row=5, column=0, columnspan=2, padx=10, pady=20, sticky="ew")
 
 # Run Application
