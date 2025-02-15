@@ -1,4 +1,5 @@
 import requests
+import os
 import pandas as pd
 import time
 import threading
@@ -19,15 +20,13 @@ running = False  # Flag to stop tracking safely
 # Create main window
 root = ctk.CTk()
 root.title("HashTrail")
+root.iconbitmap("icon.ico")
 
 # Get screen size for dynamic scaling
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 
 root.geometry("900x600")  # Default size
-# root.geometry(f"{screen_width}x{screen_height}")
-# root.geometry(f"{screen_width}x{screen_height}")
-# root.minsize(800, 500)  # Minimum size to prevent extreme resizing
 
 # Configure row/column weights to make UI **responsive**
 root.grid_rowconfigure(0, weight=1)  # Terminal output expands
@@ -79,9 +78,21 @@ def log_message(message):
     terminal_output.insert(tk.END, message + "\n")
     terminal_output.yview_moveto(1)  # Auto-scroll to latest log
 
+def get_desktop_path():
+    """Find the correct Desktop path, even if OneDrive is managing it."""
+    desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
+    
+    # Check if OneDrive manages the Desktop
+    onedrive_path = os.path.join(os.path.expanduser("~"), "OneDrive", "Desktop")
+    if os.path.exists(onedrive_path):
+        return onedrive_path  # Use OneDrive Desktop if it exists
+    
+    return desktop_path  # Default Desktop path if OneDrive is not managing it
+
 # Function to save transactions to Excel
-def save_to_excel(output_file):
+def save_to_excel():
     """ Saves the collected transactions to an Excel file before exiting. """
+    global output_file
     if traced_transactions:
         df = pd.DataFrame(traced_transactions)
         df.to_excel(output_file, index=False)
@@ -176,6 +187,7 @@ def get_transaction_details(tx_hash, chainShortName):
 def get_next_outgoing_transaction(address, token_type, initial_txid, chainShortName, protocolType):
     global layer
     page = 1
+    transactions_list = []  # Store all transactions before processing
     found_incoming = False  # Track when we locate the "in" transaction
 
     try:
@@ -197,69 +209,81 @@ def get_next_outgoing_transaction(address, token_type, initial_txid, chainShortN
 
                 if "data" in data and len(data["data"]) > 0:
                     transactions = data["data"][0].get("transactionList", [])
-
                     total_pages = int(data["data"][0].get("totalPage", "1")) if data["data"][0].get("totalPage", "").isdigit() else 100
 
-                    transactions.reverse()
+                    # transactions.reverse()
+                    transactions_list.extend(transactions)
 
                     for tx in transactions:
-                        txid = tx.get("txId", "N/A")
-                        from_address = tx.get("from", "N/A")
-                        to_address = tx.get("to", "N/A")
-                        amount = tx.get("amount", "0")
-                        transaction_symbol = tx.get("symbol", "N/A")
-                        timestamp = int(tx.get("transactionTime", "0"))
+                        if tx.get("txId") == initial_txid:
+                            found_incoming = False
+                            break  # Stop fetching more pages
 
-                        if txid == initial_txid:
-                            log_message(f"⭕ Found Initial TXID: {initial_txid}")
-                            found_incoming = True
-                            continue
+                    if found_incoming or page >= total_pages:
+                        break  # Exit loop when initial TX is found or all pages are checked
 
-                        if found_incoming and transaction_symbol == token_type and float(amount) > 0 and from_address == address:
-                            ist_time = datetime.utcfromtimestamp(timestamp / 1000) + timedelta(hours=5, minutes=30)
-                            date = ist_time.strftime('%m/%d/%Y %H:%M:%S')
-
-                            exchange_name = check_if_exchange(to_address,chainShortName)  # Check if the recipient is an exchange
-                            if exchange_name:
-                                log_message(f"✅ Stopping trace: {to_address} belongs to {exchange_name}.")
-                                return None
-
-                            log_message(f"✅ Found Outgoing TX, from: {from_address}, to: {to_address}")
-                            layer += 1
-                            return {
-                                "layer": layer,
-                                "txid": txid,
-                                "from": from_address,
-                                "to": to_address,
-                                "date": date,
-                                "amount": amount,
-                                "token_type": transaction_symbol,
-                                "exchange": exchange_name if exchange_name else "N/A"
-                            }
-
-                    if page < total_pages:
-                        page += 1
-                    else:
-                        return None
+                    page += 1
+                else:
+                    return None
             else:
-                log_message(f"❌ API Error: {response.status_code}")  
+                log_message(f"❌ API Error: {response.status_code}")
                 return None
+            
+        transactions_list.reverse()
+
+        for tx in transactions_list:
+            txid = tx.get("txId", "N/A")
+            from_address = tx.get("from", "N/A")
+            to_address = tx.get("to", "N/A")
+            amount = tx.get("amount", "0")
+            transaction_symbol = tx.get("symbol", "N/A")
+            timestamp = int(tx.get("transactionTime", "0"))
+
+            if txid == initial_txid:
+                log_message(f"⭕ Found Initial TXID: {initial_txid}")
+                found_incoming = True
+                continue
+
+            if found_incoming and transaction_symbol == token_type and float(amount) > 0 and from_address == address:
+                ist_time = datetime.utcfromtimestamp(timestamp / 1000) + timedelta(hours=5, minutes=30)
+                date = ist_time.strftime('%m/%d/%Y %H:%M:%S')
+                exchange_name = check_if_exchange(to_address,chainShortName)  # Check if the recipient is an exchange
+                if exchange_name:
+                    log_message(f"✅ Stopping trace: {to_address} belongs to {exchange_name}.")
+                    return None
+                log_message(f"✅ Found Outgoing TX, from: {from_address}, to: {to_address}")
+                layer += 1
+                return {
+                    "layer": layer,
+                    "txid": txid,
+                    "from": from_address,
+                    "to": to_address,
+                    "date": date,
+                    "amount": amount,
+                    "token_type": transaction_symbol,
+                    "exchange": exchange_name if exchange_name else "N/A"
+                }
+            
+        return None
     except KeyboardInterrupt:
         log_message("\n⚠ Interrupted! Saving data before exit...")
-        save_to_excel(output_file)
+        save_to_excel()
         exit(0)
 
 # Function to trace transactions until an exchange is found
 def trace_transactions():
-    global running
+    global running, output_file
     running = True
 
     tx_hash = entry_tx.get()
     chain_name = entry_chain.get()
     protocol_type = entry_protocol.get()
 
-    global output_file
-    output_file = f"{tx_hash}.xlsx"
+    # Get the Desktop path dynamically
+    desktop_path = get_desktop_path()
+    output_file = os.path.join(desktop_path, f"{tx_hash}.xlsx")
+    log_message(f"💾 Saving Excel file to: {output_file}")
+    # output_file = f"{tx_hash}.xlsx"
 
     if not tx_hash or not chain_name or not protocol_type:
         log_message("⚠ Please enter all required fields before starting.")
@@ -281,10 +305,10 @@ def trace_transactions():
                 log_message("No further outgoing transactions found.")
                 break
 
-        save_to_excel(output_file)
+        save_to_excel()
     except KeyboardInterrupt:
         log_message("\n⚠ Interrupted! Saving data before exit...")
-        save_to_excel(output_file)
+        save_to_excel()
         exit(0)
 
 def toggle_tracking():
