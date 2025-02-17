@@ -320,7 +320,7 @@ def toggle_tracking():
         tracking_thread.start()
     else:
         start_button.configure(text="Start", fg_color=START_COLOR, hover_color=START_COLOR)
-        time.sleep(2)
+        time.sleep(1)
         log_message("⚠ Tracking Stopped.")
         
 # Buttons
