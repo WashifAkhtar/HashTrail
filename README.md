@@ -1,19 +1,27 @@
-# HashTrail
+
+<h1><img src="icon.ico" width="30" style="vertical-align:middle;"/> HashTrail</h1>
 
 HashTrail is a cryptocurrency forensics tool designed to trace transactions across blockchain networks. Its primary objective is to assist in digital investigations by analyzing transaction paths, detecting anomalies, and providing clarity in the movement of digital assets.
 
-🚀 Features
 
-- Trace transactions across multiple blockchain networks
+## 🔍 **About HashTrail**
+HashTrail empowers investigators and analysts to:
+- Track blockchain transactions step-by-step.
+- Detect anomalies and suspicious transfers.
+- Identify exchange wallets using OKLink API.
+- Generate detailed transcation log for forensic documentation.
 
-- Visualize transaction paths and identify potential anomalies
 
-- Export reports for investigation documentation
+## ⚡ **Features**
+- **Multi-Chain Support:** Supports major blockchains like Ethereum, Tron, Binance Smart Chain, and more.
+- **Exchange Detection:** Automatically checks if an address belongs to an exchange.
+- **Real-time Visualization:** View transaction flow in real-time with a custom UI.
+- **Exportable Reports:** Save transaction paths as Excel files for offline analysis.
+- **Windows Compatibility:** Optimized for Windows OS with a sleek, dark-themed GUI.
 
-- Efficient address clustering for deeper analysis
 
-📦 Installation
-```
+## 📦 **Installation**
+```bash
 # Clone the repository
 git clone https://github.com/WashifAkhtar/HashTrail.git
 
@@ -21,15 +29,15 @@ git clone https://github.com/WashifAkhtar/HashTrail.git
 cd HashTrail
 
 # (Optional) Create a virtual environment
-python3 -m venv venv
-source venv/bin/activate   # On Windows use `venv\Scripts\activate`
+python -m venv venv
+.\venv\Scripts\activate  # Activate the virtual environment (Windows)
 
 # Install dependencies
 pip install -r requirements.txt
 ```
-🔑 API Configuration
+## 🔑 API Configuration
 
-Create a file named api_key.py in the root directory and add your OKLink API key:
+Add your OKLink API key in a file named `api_key.py` in the root directory:
 ```
 # api_key.py
 API_KEY = 'your_api_key_here'
@@ -41,31 +49,36 @@ python src/HashTrail.py
 
 # Enter the transaction hash, chain name, and protocol type in the UI
 ```
-📝 Supported Chains
+When the application launches:
 
-Refer to the docs/supported_chains.docx for a list of supported blockchain networks and their short names.
+1. Enter the Transaction Hash.
+2. Provide the Chain Name (e.g., TRON, ETH).
+3. Specify the Protocol Type (e.g., token_20).
+4. Click Start to begin the trace.
 
-🤝 Contributing
+## 📝 Supported Chains
+
+Refer to the `docs/supported_chains.docx` for a list of supported blockchain networks and their short names.
+
+## 🤝 Contributing
 
 Contributions are welcome! Please follow these steps:
 
 1. Fork the repository.
-
 2. Create a new branch (`feature/your-feature`).
-
 3. Commit your changes (`git commit -m 'Add your feature'`).
-
 4. Push to the branch (`git push origin feature/your-feature`).
-
 5. Create a Pull Request.
 
-📜 License
+## 📜 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-📞 Contact
+## 📞 Contact
 
-For any issues or suggestions, feel free to open an issue or reach out directly at your email.
+For any issues or suggestions, feel free to open an issue or reach out directly:
+
+GitHub: [WashifAkhtar](https://github.com/WashifAkhtar)
 #
 Crafted with 💡 by Washif Akhtar
 
