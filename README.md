@@ -1,5 +1,5 @@
 
-<h1><img src="icon.ico" width="30" style="vertical-align:middle;"/> HashTrail</h1>
+<h1><img src="src/icon.ico" width="30" style="vertical-align:middle;"/> HashTrail</h1>
 
 HashTrail is a cryptocurrency forensics tool designed to trace transactions across blockchain networks. Its primary objective is to assist in digital investigations by analyzing transaction paths, detecting anomalies, and providing clarity in the movement of digital assets.
 
